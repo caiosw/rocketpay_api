@@ -1,5 +1,7 @@
 # Rocketpay
 
+This is a Payments API made with Elixir for Rocketseat's Next Level Week 4. Still in progress...
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
