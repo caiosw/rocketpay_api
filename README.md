@@ -1,6 +1,19 @@
 # Rocketpay
 
-This is a Payments API made with Elixir for Rocketseat's Next Level Week 4. Still in progress...
+This is a Payments API made with Elixir for Rocketseat's Next Level Week 4 bootcamp.
+
+This project covered come features like:
+- Elixir, Phoenix and Ecto
+- Handling DB tables and transactions with Ecto.Multi
+- Creating Routes with Phoenix
+- Testing with ExUnit and ConnCase
+- Basic auth
+
+After the course end, I added some new features by myself like:
+- Bigger test coverage;
+- Fix to the API bug that was accepting negative numbers, that could be used to make a deposit subtract money from the account;
+- Saving transactions data to the new table "transactions"
+
 
 To start your Phoenix server:
 
