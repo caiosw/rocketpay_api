@@ -12,7 +12,6 @@ defmodule Rocketpay.Accounts.Transaction do
     |> Multi.merge(fn _changes -> Operation.call(withdraw_params, :withdraw) end)
     |> Multi.merge(fn _changes -> Operation.call(deposit_params, :deposit) end)
     |> run_transaction()
-    |> IO.inspect()
   end
 
   defp build_params(id, value), do: %{"id" => id, "value" => value}

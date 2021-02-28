@@ -100,11 +100,25 @@ defmodule RocketpayWeb.AccountsControllerTest do
       assert response == expected_response
     end
 
-    test "when there are invalid params, returns an error", %{conn: conn, account_id: account_id} do
-      params = %{"value" => "-50"}
+    test "when there isn't enough balance, returns an error", %{conn: conn, account_id: account_id} do
+      params = %{"value" => "30"}
 
       response = conn
       |> post(Routes.accounts_path(conn, :withdraw, account_id, params))
+      |> json_response(:bad_request) # or |> json_response(400)
+
+      expected_response = %{"message" => "Invalid withdraw value! Positive decimal value expected."}
+
+      assert response == expected_response
+    end
+
+    test "when there are invalid params, returns an error", %{conn: conn, account_id: account_id} do
+      params_deposit = %{"value" => "50"}
+      params_withdraw = %{"value" => "test"}
+
+      response = conn
+      |> post(Routes.accounts_path(conn, :deposit, account_id, params_deposit))
+      |> post(Routes.accounts_path(conn, :withdraw, account_id, params_withdraw))
       |> json_response(:bad_request) # or |> json_response(400)
 
       expected_response = %{"message" => "Invalid withdraw value! Positive decimal value expected."}
@@ -125,5 +139,74 @@ defmodule RocketpayWeb.AccountsControllerTest do
     end
   end
 
+  describe "transaction/3" do
+    setup %{conn: conn} do
+      params_user1 = %{
+        name: "Caio",
+        password: "123456",
+        nickname: "caiosw",
+        email: "caiosw@gmail.com",
+        age: 31
+      }
+
+      {:ok, %User{account: %Account{id: account_id_from}}} = Rocketpay.create_user(params_user1)
+
+      params_user2 = %{
+        name: "João",
+        password: "123456",
+        nickname: "joao",
+        email: "joao@test.test",
+        age: 31
+      }
+
+      {:ok, %User{account: %Account{id: account_id_to}}} = Rocketpay.create_user(params_user2)
+
+      conn = put_req_header(conn, "authorization", "Basic cG90YXRvOlRlc3QxMjM0")
+
+      {:ok, conn: conn, account_id_from: account_id_from, account_id_to: account_id_to}
+    end
+
+    test "when all params are valid, make the transaction", %{conn: conn, account_id_from: account_id_from, account_id_to: account_id_to} do
+      params_deposit = %{"value" => "50"}
+      params_transaction = %{
+        "value" => "30",
+        "from" => account_id_from,
+        "to" => account_id_to
+      }
+
+      response = conn
+      |> post(Routes.accounts_path(conn, :deposit, account_id_from, params_deposit))
+      |> post(Routes.accounts_path(conn, :transaction, params_transaction))
+      |> json_response(:ok)
+
+      expected_response = %{
+        "message" => "Transaction done successfully",
+        "transaction" => %{
+          "from_account" => %{
+            "balance" => "20.00",
+            "id" => account_id_from
+          },
+          "to_account" => %{
+            "balance" => "30.00",
+            "id" => account_id_to
+          }
+        }
+      }
+
+      assert response == expected_response
+    end
+
+    # test "when the account id is invalid, returns an error", %{conn: conn, account_id_from: account_id_from, account_id_to: account_id_to} do
+    #   params = %{"value" => "1"}
+
+    #   response = conn
+    #   |> post(Routes.accounts_path(conn, :withdraw, "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", params))
+    #   |> json_response(:bad_request) # or |> json_response(400)
+
+    #   expected_response = %{"message" => "Account not found!"}
+
+    #   assert response == expected_response
+    # end
+  end
 
 end
