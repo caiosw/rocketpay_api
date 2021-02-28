@@ -30,24 +30,27 @@ defmodule Rocketpay.Accounts.Operation do
   defp operation(%Account{balance: balance}, value, operation) do
     value
     |> Decimal.cast()
-    |> is_positive()
     |> handle_cast(balance, operation)
-
   end
 
-  defp handle_cast({:ok, value}, balance, :deposit), do: Decimal.add(balance, value)
-  defp handle_cast({:ok, value}, balance, :withdraw), do: Decimal.sub(balance, value)
-  defp handle_cast(:error, _balance, :deposit), do: {:error, "Invalid deposit value! Positive decimal value expected."}
-  defp handle_cast(:error, _balance, :withdraw), do: {:error, "Invalid withdraw value! Positive decimal value expected."}
-
-  defp is_positive(:error = error), do: error
-  defp is_positive({:ok, value} = decimal) do
+  defp handle_cast({:ok, value}, balance, operation) do
     if Decimal.lt?(value, 0) do
-      :error
+        {:error, "The value must be a positive decimal!"}
     else
-      decimal
+      case {operation} do
+        {:deposit} ->
+          Decimal.add(balance, value)
+        {:withdraw} ->
+          if Decimal.lt?(balance, value) do
+            {:error, "There's not enough balance for this operation!"}
+          else
+            Decimal.sub(balance, value)
+          end
+      end
     end
   end
+
+  defp handle_cast(:error, _balance, _operation), do: {:error, "Invalid value! Positive decimal expected."}
 
   defp update_account({:error, _reason} = error, _repo, _account), do: error
 
