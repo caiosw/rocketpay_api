@@ -213,4 +213,22 @@ defmodule RocketpayWeb.AccountsControllerTest do
     end
   end
 
+  test "when authorization is invalid, returns an error", %{conn: conn} do
+    params = %{
+      "value" => "50",
+      "from" => "1234",
+      "to" => "4321"
+    }
+
+    response =
+      conn
+      |> put_req_header("authorization", "basic potato")
+      |> post(Routes.accounts_path(conn, :transaction, params))
+      |> response(:unauthorized)
+
+    expected_response = "Unauthorized"
+
+    assert response == expected_response
+  end
+
 end
