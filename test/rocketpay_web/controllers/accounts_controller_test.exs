@@ -180,16 +180,14 @@ defmodule RocketpayWeb.AccountsControllerTest do
       |> json_response(:ok)
 
       expected_response = %{
-        "message" => "Transaction done successfully",
+        "message" => "Transaction done successfully, your new balance is 20.00",
         "transaction" => %{
-          "from_account" => %{
-            "balance" => "20.00",
-            "id" => account_id_from
-          },
-          "to_account" => %{
-            "balance" => "30.00",
-            "id" => account_id_to
-          }
+          "to_account_id" => account_id_to,
+          "transfered_value" => "30"
+        },
+        "your_account" => %{
+          "id" => account_id_from,
+          "new_balance" => "20.00"
         }
       }
 

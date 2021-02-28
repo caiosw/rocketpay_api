@@ -26,8 +26,6 @@ defmodule Rocketpay.Accounts.Transaction do
   end
 
   defp run_transaction(multi, value) do
-    IO.puts("#################################### potato ##########################################")
-    IO.inspect(multi)
     case Repo.transaction(multi) do
       {:error, _operation, reason, _changes} -> {:error, reason}
       {:ok, %{deposit: to_account, withdraw: from_account}} ->
