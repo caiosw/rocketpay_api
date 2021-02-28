@@ -2,7 +2,7 @@ defmodule Rocketpay.Account do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Rocketpay.User
+  alias Rocketpay.{User, Transaction}
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
@@ -12,6 +12,7 @@ defmodule Rocketpay.Account do
   schema "accounts" do
     field :balance, :decimal
     belongs_to :user, User
+    has_many :transaction, Transaction
 
     timestamps()
   end
