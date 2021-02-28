@@ -45,7 +45,7 @@ defmodule RocketpayWeb.AccountsControllerTest do
       |> post(Routes.accounts_path(conn, :deposit, account_id, params))
       |> json_response(:bad_request) # or |> json_response(400)
 
-      expected_response = %{"message" => "Invalid deposit value! Positive decimal value expected."}
+      expected_response = %{"message" => "The value must be a positive decimal!"}
 
       assert response == expected_response
     end
@@ -107,7 +107,7 @@ defmodule RocketpayWeb.AccountsControllerTest do
       |> post(Routes.accounts_path(conn, :withdraw, account_id, params))
       |> json_response(:bad_request) # or |> json_response(400)
 
-      expected_response = %{"message" => "Invalid withdraw value! Positive decimal value expected."}
+      expected_response = %{"message" => "There's not enough balance for this operation!"}
 
       assert response == expected_response
     end
@@ -121,7 +121,7 @@ defmodule RocketpayWeb.AccountsControllerTest do
       |> post(Routes.accounts_path(conn, :withdraw, account_id, params_withdraw))
       |> json_response(:bad_request) # or |> json_response(400)
 
-      expected_response = %{"message" => "Invalid withdraw value! Positive decimal value expected."}
+      expected_response = %{"message" => "Invalid value! Positive decimal expected."}
 
       assert response == expected_response
     end
