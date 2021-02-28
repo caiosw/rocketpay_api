@@ -196,17 +196,21 @@ defmodule RocketpayWeb.AccountsControllerTest do
       assert response == expected_response
     end
 
-    # test "when the account id is invalid, returns an error", %{conn: conn, account_id_from: account_id_from, account_id_to: account_id_to} do
-    #   params = %{"value" => "1"}
+    test "when there isn't enough balance, returns an error", %{conn: conn, account_id_from: account_id_from, account_id_to: account_id_to} do
+      params_transaction = %{
+        "value" => "1000",
+        "from" => account_id_from,
+        "to" => account_id_to
+      }
 
-    #   response = conn
-    #   |> post(Routes.accounts_path(conn, :withdraw, "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", params))
-    #   |> json_response(:bad_request) # or |> json_response(400)
+      response = conn
+      |> post(Routes.accounts_path(conn, :transaction, params_transaction))
+      |> json_response(:bad_request) # or |> json_response(400)
 
-    #   expected_response = %{"message" => "Account not found!"}
+      expected_response = %{"message" => "There's not enough balance for this operation!"}
 
-    #   assert response == expected_response
-    # end
+      assert response == expected_response
+    end
   end
 
 end
